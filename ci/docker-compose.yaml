@@ -5,8 +5,6 @@ services:
     container_name: postgres
     image: postgres:18
     restart: on-failure
-    ports:
-      - "35432:5432"
     env_file:
       - ../.env
     volumes:
@@ -19,10 +17,8 @@ services:
 
   rabbit:
     container_name: rabbitmq
-    image: rabbitmq:4-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+    image: rabbitmq:4
+    restart: on-failure
     env_file:
       - ../.env
     healthcheck:
@@ -33,6 +29,7 @@ services:
 
   api:
     container_name: payment-processing-api
+    restart: on-failure
     build:
       context: ../
       dockerfile: ./ci/Dockerfile.api
@@ -47,6 +44,7 @@ services:
 
   consumer:
     container_name: consumer
+    restart: on-failure
     build:
       context: ../
       dockerfile: ./ci/Dockerfile.consumer
@@ -54,15 +52,29 @@ services:
     depends_on:
       rabbit:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   outbox:
     container_name: outbox-worker
+    restart: on-failure
     build:
       context: ../
       dockerfile: ./ci/Dockerfile.outbox
     env_file: ../.env
     depends_on:
       rabbit:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  migrate:
+    build:
+      context: ../
+      dockerfile: ./ci/Dockerfile.migrate
+    env_file: ../.env
+    depends_on:
+      postgres:
         condition: service_healthy
 
 volumes:

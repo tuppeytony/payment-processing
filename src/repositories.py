@@ -65,7 +65,7 @@ class OutboxRepository:
         new_outbox = OutboxModel(
             created_at=datetime.datetime.now(),
             event_type=event_type,
-            payload=payload.model_dump(),
+            payload=payload.model_dump(mode="json"),
             status=OutboxEventStatus.PENDING,
         )
         self._session.add(new_outbox)

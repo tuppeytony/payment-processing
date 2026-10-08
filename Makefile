@@ -1,4 +1,5 @@
 run:
+	cp .env.example .env
 	docker volume create postgres-data;\
 	docker compose -p payment-processing -f ./ci/docker-compose.yaml up -d
 

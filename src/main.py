@@ -26,8 +26,7 @@ app = FastAPI(
     title=app_settings.title,
     lifespan=lifespan,
 )
-if not app_settings.debug:
-    app.add_middleware(AuthMiddleware, x_api_key=app_settings.x_api_key)
+app.add_middleware(AuthMiddleware, x_api_key=app_settings.x_api_key)
 
 app.include_router(payments.router, prefix="/api/v1")
 
