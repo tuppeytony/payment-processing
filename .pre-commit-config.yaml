@@ -1,0 +1,51 @@
+default_install_hook_types:
+  [pre-commit, post-checkout, post-merge, post-rewrite]
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.16.10"
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic, pydantic-settings, sqlalchemy]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: "7.4.1"
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-broken-line
+          - flake8-eradicate
+          - flake8-functions
+          - flake8-mutable
+          - flake8-string-format
+          - flake8-variables-names
+          - flake8-pydantic
+          - flake8-sql
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.23
+    hooks:
+      - id: uv-lock
+      - id: uv-sync
+        stages: [post-checkout, post-merge, post-rewrite]
