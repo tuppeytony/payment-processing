@@ -4,6 +4,8 @@ import logging
 from faststream.rabbit import RabbitBroker
 
 from broker import EXCHANGE, NEW_KEY, broker, declare_topology
+from common import configure_logging
+from config import app_settings
 from repositories import OutboxRepository
 from storages import async_session
 
@@ -28,11 +30,13 @@ async def publish_batch(broker: RabbitBroker) -> None:
                 await OutboxRepository.mark_failed(event)
                 log.exception("Could not publish outbox event %s", event.outbox_id)
             else:
+                log.info("Event published")
                 await OutboxRepository.mark_published(event)
 
 
 async def run_relay(broker: RabbitBroker) -> None:
     """Запуск отправки в очередь."""
+    log.info("Outbox worker is started")
     while True:
         try:
             await publish_batch(broker)
@@ -48,4 +52,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    configure_logging(app_settings.log_level)
     asyncio.run(main())
